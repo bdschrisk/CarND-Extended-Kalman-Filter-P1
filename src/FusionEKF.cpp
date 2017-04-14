@@ -19,13 +19,18 @@ FusionEKF::FusionEKF() {
 
   previous_timestamp_ = 0;
 
-  noise_ax = 9;
-  noise_ay = 9;
+  noise_ax = 8.6F;
+  noise_ay = 8.6F;
+
+	time_delta = 0.001F;
 
 	// Initialize Sensors //
 	
 	sensors_.push_back(&radar);
 	sensors_.push_back(&lidar);
+
+	// Initialise Kalman Filter
+	ekf_ = KalmanFilter(4, 1000.0F);
 }
 
 /**
@@ -40,8 +45,10 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
 	size_t N = sensors_.size();
 	for (size_t i = 0; i < N; i++) {
-		if (sensors_[i]->Handles(measurement_pack.sensor_type_))
+		if (sensors_[i]->Handles(measurement_pack.sensor_type_)) {
 			sensor = sensors_[i];
+			break;
+		}
 	}
 
 	// check valid sensor
@@ -56,9 +63,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   if (!is_initialized_) {
     // first measurement
     cout << "EKF: " << endl;
-
-		// Initialise Kalman Filter
-		ekf_ = KalmanFilter(4, 1000.0F);
 
 		// update sensor with initial measurement
 		sensor->Update(ekf_.x_, measurement_pack);
@@ -84,16 +88,23 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 	*  EKF Predict and Update
 	****************************************************************************/
 
-	// measurement
-  VectorXd z = measurement_pack.raw_measurements_;
-	
-	// Predicts t+1 state
-	VectorXd x_p = ekf_.F_ * ekf_.x_;
-	ekf_.Predict(x_p, ekf_.F_);
+	// check for multiple simultaneous measurements
+	if (dt > time_delta)
+	{
+		// Predicts t+1 state
+		VectorXd x_p = ekf_.F_ * ekf_.x_;
+		ekf_.Predict(x_p, ekf_.F_);
+	}
 
-	// Updates new state with correct error measures
-	VectorXd z_pred = sensor->Project(ekf_.x_);
-	ekf_.Update(z, z_pred, sensor->H_, sensor->R_);
+	// check numerical stability
+	if ((ekf_.x_[0] > FLT_EPSILON || ekf_.x_[0] < -FLT_EPSILON)
+		&& (ekf_.x_[1] > FLT_EPSILON || ekf_.x_[1] < -FLT_EPSILON)) {
+		// measurement
+		VectorXd z = measurement_pack.raw_measurements_;
+		// Updates new state with correct error measures
+		VectorXd z_pred = sensor->Project(ekf_.x_);
+		ekf_.Update(z, z_pred, sensor->H_, sensor->R_);
+	}
 
   // print the output
   cout << "x_ = " << ekf_.x_ << endl;

@@ -64,13 +64,14 @@ void KalmanFilter::Update(const VectorXd &z, const VectorXd &z_pred, const Matri
 	
 	// update step
 	MatrixXd Ht = H.transpose();
-	MatrixXd S = H * P_ * Ht + R;
-	MatrixXd K = P_ * Ht * S.inverse();
+	MatrixXd PHt = P_ * Ht;
+	MatrixXd S = H * PHt + R;
+	MatrixXd K = PHt * S.inverse();
 	
 	// projected update
 	x_ = x_ + (K * y);
-	long x_size = x_.size();
 
+	long x_size = x_.size();
 	MatrixXd I = MatrixXd::Identity(x_size, x_size);
 	P_ = (I - K * H) * P_;
 }

@@ -45,6 +45,8 @@ private:
   float noise_ax;
   float noise_ay;
 
+	float time_delta;
+
   // tool object used to compute Jacobian and RMSE
   Tools tools;
 
