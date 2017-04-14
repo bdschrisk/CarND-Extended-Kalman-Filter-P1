@@ -19,8 +19,8 @@ FusionEKF::FusionEKF() {
 
   previous_timestamp_ = 0;
 
-  noise_ax = 8.6F;
-  noise_ay = 8.6F;
+  noise_ax = 8.5F;
+  noise_ay = 8.5F;
 
 	time_delta = 0.001F;
 
