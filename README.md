@@ -6,11 +6,11 @@ Self-Driving Car Engineer Nanodegree Program
 ## Overview
 In this project, a sensor fusion algorithm is implemented for tracking pedestrians using data from Lidar and Radar sensors.  
 
-Depending on the sensor type, a linear or non-linear motion model is utilised to project the measurement into linear space 
+Depending on the sensor type, a linear or non-linear measurement model is utilised to project the measurement into cartesian space 
 for commonality, to update our belief of the tracked pedestrian's pose and heading.
 
 To process the Radar measurements, given in polar coordinates, an extended kalman filter model is used to support such measurements.
-This is done by using projection and multivariate Taylor expansion, to express our non-linear motion model into linear cartesian 
+This is done by using projection and multivariate Taylor expansion, to express our non-linear measurement model into linear cartesian 
 coordinates.  Without applying these techniques, our Gaussian probability function P, would become unusable and corrupt the belief state.
 
 ## Structure
