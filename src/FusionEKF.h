@@ -8,6 +8,9 @@
 #include <fstream>
 #include "kalman_filter.h"
 #include "tools.h"
+#include "Sensor/Sensor.h"
+#include "Sensor/LidarSensor.h"
+#include "Sensor/RadarSensor.h"
 
 class FusionEKF {
 public:
@@ -36,14 +39,20 @@ private:
   bool is_initialized_;
 
   // previous timestamp
-  long previous_timestamp_;
+  long long previous_timestamp_;
+
+  //acceleration noise components
+  float noise_ax;
+  float noise_ay;
 
   // tool object used to compute Jacobian and RMSE
   Tools tools;
-  Eigen::MatrixXd R_laser_;
-  Eigen::MatrixXd R_radar_;
-  Eigen::MatrixXd H_laser_;
-  Eigen::MatrixXd Hj_;
+
+	// Sensors array
+	RadarSensor radar;
+	LidarSensor lidar;
+
+	std::vector<Sensor*> sensors_;
 };
 
 #endif /* FusionEKF_H_ */

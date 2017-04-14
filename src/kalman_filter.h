@@ -11,22 +11,22 @@ public:
   // state covariance matrix
   Eigen::MatrixXd P_;
 
-  // state transistion matrix
+  // state transition matrix
   Eigen::MatrixXd F_;
 
   // process covariance matrix
   Eigen::MatrixXd Q_;
 
   // measurement matrix
-  Eigen::MatrixXd H_;
+  //Eigen::MatrixXd H_;
 
   // measurement covariance matrix
-  Eigen::MatrixXd R_;
+  //Eigen::MatrixXd R_;
 
   /**
    * Constructor
    */
-  KalmanFilter();
+	KalmanFilter(const int state_dim = 4, const float p_val = 1000.0);
 
   /**
    * Destructor
@@ -45,24 +45,29 @@ public:
   void Init(Eigen::VectorXd &x_in, Eigen::MatrixXd &P_in, Eigen::MatrixXd &F_in,
       Eigen::MatrixXd &H_in, Eigen::MatrixXd &R_in, Eigen::MatrixXd &Q_in);
 
-  /**
-   * Prediction Predicts the state and the state covariance
-   * using the process model
-   * @param delta_T Time between k and k+1 in s
-   */
-  void Predict();
+  /*
+  * Sets the time delta of the transition state function
+  * @param delta: Time delta expressed in seconds
+  * @param noise_ax: X dimensional noise
+  * @param noise_ay: Y dimensional noise
+  */
+  void SetDelta(double delta, double noise_ax, double noise_ay);
 
   /**
-   * Updates the state by using standard Kalman Filter equations
-   * @param z The measurement at k+1
-   */
-  void Update(const Eigen::VectorXd &z);
+  * Predicts the state and the state covariance
+  * @param Fx: State prime
+  * @param Fj: State transition matrix
+  */
+  void Predict(const Eigen::VectorXd Fx, const Eigen::MatrixXd Fj);
 
   /**
-   * Updates the state by using Extended Kalman Filter equations
-   * @param z The measurement at k+1
-   */
-  void UpdateEKF(const Eigen::VectorXd &z);
+  * Updates the state by using Kalman Filter equations
+  * @param z: The measurement at k+1
+  * @param z_pred: State transition
+  * @param H: Measurement space error matrix
+	* @param R: Measurement noise corruption
+  */
+  void Update(const Eigen::VectorXd &z, const Eigen::VectorXd &z_pred, const Eigen::MatrixXd &H, const Eigen::MatrixXd &R);
 
 };
 
