@@ -17,6 +17,9 @@ public:
   // process covariance matrix
   Eigen::MatrixXd Q_;
 
+	// identity matrix
+	Eigen::MatrixXd I_;
+
   /**
    * Constructor
    */
@@ -48,10 +51,8 @@ public:
 
   /**
   * Predicts the state and the state covariance
-  * @param Fx: State prime
-  * @param Fj: State transition matrix
   */
-  void Predict(const Eigen::VectorXd Fx, const Eigen::MatrixXd Fj);
+  void Predict();
 
   /**
   * Updates the state by using Kalman Filter equations

@@ -15,6 +15,8 @@ KalmanFilter::KalmanFilter(const int state_dim, const float p_val)
 	P_ = MatrixXd::Identity(state_dim, state_dim);
 	// set initial uncertainty
 	P_.bottomRightCorner(state_dim / 2, state_dim / 2) = MatrixXd::Identity(state_dim / 2, state_dim / 2) * p_val;
+
+	I_ = MatrixXd::Identity(state_dim, state_dim);
 }
 
 KalmanFilter::~KalmanFilter() { }
@@ -48,11 +50,11 @@ void KalmanFilter::SetDelta(double delta, double noise_ax, double noise_ay)
 	Q_ = (G * Qv) * G.transpose();
 }
 
-void KalmanFilter::Predict(const VectorXd Fx, const MatrixXd Fj) {
+void KalmanFilter::Predict() {
 	// predict new state and uncertainty
-	x_ = Fx;
-	MatrixXd F_t  = Fj.transpose();
-	P_ = Fj * P_ * F_t + Q_;
+	x_ = F_ * x_;
+	MatrixXd F_t  = F_.transpose();
+	P_ = F_ * P_ * F_t + Q_;
 }
 
 void KalmanFilter::Update(const VectorXd &z, const VectorXd &z_pred, const MatrixXd &H, const MatrixXd &R) {
@@ -67,9 +69,6 @@ void KalmanFilter::Update(const VectorXd &z, const VectorXd &z_pred, const Matri
 	
 	// projected update
 	x_ = x_ + (K * y);
-
-	long x_size = x_.size();
-	MatrixXd I = MatrixXd::Identity(x_size, x_size);
-	P_ = (I - K * H) * P_;
+	P_ = (I_ - K * H) * P_;
 }
 

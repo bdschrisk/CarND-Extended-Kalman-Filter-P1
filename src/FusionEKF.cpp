@@ -13,8 +13,8 @@ FusionEKF::FusionEKF() {
 
   previous_timestamp_ = 0;
 
-  noise_ax = 8.5F;
-  noise_ay = 8.5F;
+  noise_ax = 9.0F;
+  noise_ay = 9.0F;
 
 	time_delta = 0.001F;
 
@@ -85,9 +85,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 	// check for multiple simultaneous measurements
 	if (dt > time_delta)
 	{
-		// Predicts t+1 state
-		VectorXd x_p = ekf_.F_ * ekf_.x_;
-		ekf_.Predict(x_p, ekf_.F_);
+		// Predicts state P
+		ekf_.Predict();
 	}
 
 	// check numerical stability

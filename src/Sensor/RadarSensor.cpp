@@ -8,9 +8,11 @@ using Eigen::VectorXd;
 */
 RadarSensor::RadarSensor()
 {
-	H_ = MatrixXd(3, 4);
+	// initialise measurement matrix
+	H_ = MatrixXd::Zero(3, 4);
 
 	R_ = MatrixXd(3, 3);
+	// set measurement covariance
 	R_ << 0.09, 0, 0,
 				0, 0.0009, 0,
 				0, 0, 0.09;
@@ -28,10 +30,12 @@ bool RadarSensor::Handles(const MeasurementPackage::SensorType &sensorType)
 
 void RadarSensor::Update(const VectorXd &state, const MeasurementPackage &measurement)
 {
-	double px = state[0];
-	double py = state[1];
-	double vx = state[2];
-	double vy = state[3];
+	VectorXd stateP = Dampen(measurement.raw_measurements_);
+
+	double px = stateP[0];
+	double py = stateP[1];
+	double vx = stateP[2];
+	double vy = stateP[3];
 
 	// compute first order derivs
 	double px_2 = pow(px, 2);
